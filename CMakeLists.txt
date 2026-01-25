@@ -7,7 +7,6 @@ add_subdirectory(vendor)
 add_subdirectory(source)
 # add_executable(${PROJECT_NAME} source/main.cpp)
 
-# Require C++25
 set_target_properties(${PROJECT_NAME} PROPERTIES
   CXX_STANDARD 23
   CXX_STANDARD_REQUIRED YES
@@ -16,6 +15,5 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 target_compile_options(${PROJECT_NAME} PRIVATE -std=c++23)
 
-# Optional: helpful warnings (remove if you don't want them)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 

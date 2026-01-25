@@ -11,3 +11,4 @@ Goals
 
 # References
 1. [FTXUI](https://github.com/ArthurSonzogni/FTXUI)
+2. [Access UART on Linux](https://www.youtube.com/watch?v=n2s8Y8slL28)
