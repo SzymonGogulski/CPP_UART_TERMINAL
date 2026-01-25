@@ -10,4 +10,4 @@ Goals
 # YouTube demo
 
 # References
-1. [FTXUI]([https://github.com/muhammedkocaoglu/Gaussian-Filter-Implementation-Using-Vitis-HLS)](https://github.com/ArthurSonzogni/FTXUI)
+1. [FTXUI](https://github.com/ArthurSonzogni/FTXUI)
