@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.20)
 
 project(UartTerminal LANGUAGES CXX)
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_subdirectory(vendor)
+
+add_subdirectory(source)
+# add_executable(${PROJECT_NAME} source/main.cpp)
 
 # Require C++25
 set_target_properties(${PROJECT_NAME} PROPERTIES
