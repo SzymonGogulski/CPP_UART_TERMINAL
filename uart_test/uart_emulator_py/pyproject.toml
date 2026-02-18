@@ -1,0 +1,18 @@
+[project]
+name = "uart-emulator-py"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Szymon Gogulski",email = "szymongogulskiedu@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "serial (>=0.0.97,<0.0.98)",
+    "pyvirtualserialports (>=2.0.0,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

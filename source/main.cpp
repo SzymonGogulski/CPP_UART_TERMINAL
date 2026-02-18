@@ -39,17 +39,30 @@ int main() {
     int tb_size = 10, tb_min = 3, tb_max = 50;
     
     // Left pane config menus
-    std::vector<std::string> entries = {
-        "tribute",     "clearance", "ally",        "bend",        "electronics",
-        "module",      "era",       "cultural",    "sniff",       "nationalism",
-        "negotiation", "deliver",   "figure",      "east",        "tribute",
-        "clearance",   "ally",      "bend",        "electronics", "module",
-        "era",         "cultural",  "sniff",       "nationalism", "negotiation",
-        "deliver",     "figure",    "east",        "tribute",     "clearance",
-        "ally",        "bend",      "electronics", "module",      "era",
-        "cultural",    "sniff",     "nationalism", "negotiation", "deliver",
-        "figure",      "east",
+
+    std::vector<int> entries_buadrate = {
+        9600, 4800, 19200, 38400, 57600, 115200, 230400, 460800, 921600
     };
+
+    std::vector<std::string> entries_parity = {
+        
+    };
+
+
+    std::vector<std::string> entries_stop_bits = {
+        
+    };
+
+
+    std::vector<std::string> entries_data_bits = {
+        
+    };
+
+
+    std::vector<std::string> entries = {
+        
+    };
+
 
     int selected_1 = 0;
     int selected_2 = 0;
