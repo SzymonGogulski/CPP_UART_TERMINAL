@@ -3,6 +3,10 @@
 #include <string.h>
 #include <iostream>
 
+// Threading libraries
+#include <thread>
+#include <atomic>
+
 // Linux headers
 #include <fcntl.h> // Contains file controls like O_RDWR
 #include <errno.h> // Error integer and strerror() function
@@ -89,24 +93,57 @@ int readFromSerialPort(int port, char* buffer, size_t size){
     return n;
 }
 
+std::atomic<bool> keepReading(true);
+
+void serialListener(int port){
+
+    char buffer[256];
+
+    while (keepReading)
+    {
+        int n = read(port, buffer, sizeof(buffer) - 1);
+
+        if (n < 0){ 
+            std::cerr << "Failed reading from port: " << strerror(errno) << std::endl;
+        } else if (n > 0) {
+            std::cout << "Thread read : " << n << " bytes from port. " << std::endl;
+            std::cout << "Message read: " << std::string(buffer);
+        }
+    }
+}
+
 int main(int argc, char* argv[]) {
-    
+   
+    if (argc == 4){
+        std::cout << "Port: " << argv[1] << " | baudrate: " << argv[2] << " | message: " << argv[3] << std::endl;
+        
+    } else {
+        std::cout << "Not enough arguments. \n";
+        std::abort();
+    }
+
     const char* port_arg = argv[1];
     int baudrate_arg = arg2Baudrate(argv[2]);
     std::string msg = std::string(argv[3]) + "\n"; 
-    char buffer[100];
-    
-    std::cout << "Port: " << argv[1] << " | baudrate: " << argv[2] << " | message: " << argv[3] << std::endl;
-    
+
+    // char buffer[100];
+        
     int port = openSerialPort(port_arg);
 
     if (!configureSerialPort(port, baudrate_arg)){
         closeSerialPort(port);
-        return EXIT_FAILURE;
+        std::abort();
     }
 
     writeToSerialPort(port, msg.c_str(), msg.size());
-    readFromSerialPort(port, buffer, sizeof(buffer));
+    // readFromSerialPort(port, buffer, sizeof(buffer));
+
+    std::thread listenerThread(serialListener, port);
+
+    std::cin.get();
+    keepReading = false;
+
+    listenerThread.join();
     closeSerialPort(port);
 
     return 0;
