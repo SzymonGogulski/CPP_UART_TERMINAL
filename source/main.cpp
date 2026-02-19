@@ -88,12 +88,26 @@ int main() {
         return layout->Render() | flex;
     });
 
-
+    std::string input_text;
+    Component input_window = Input(&input_text, "Input text");
+    
+      // The component tree:
+    auto input_component = Container::Vertical({
+        input_window,
+  });
+ 
+  // Tweak how the component tree is rendered:
+  auto input_renderer = Renderer(input_component, [&] {
+    return vbox({
+               hbox(text(" First name : "), input_component->Render()),
+           }) |
+           border;
+  });
 
     // Panes
     auto left  = Pane("Config Menu",  left_pane_content);
     auto top   = Pane("Receiver",   Renderer([] { return text("Receiver content") | center; }));
-    auto bottom= Pane("Transmitter",Renderer([] { return text("Transmitter content") | center; }));
+    auto bottom= Pane("Transmitter", input_renderer);
 
 
     // Right split (Top/Bottom)
