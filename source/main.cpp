@@ -1,4 +1,5 @@
 #include <ftxui/component/component_base.hpp>
+#include <ftxui/screen/string.hpp>
 #include <string>
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
@@ -11,6 +12,67 @@ Component Pane(std::string title, Component child) {
     return Renderer(child, [title, child] {
         return window(text(title), child->Render() | flex);
     });
+}
+
+
+static std::vector<std::string> received_messages;
+static std::vector<std::string> transmitted_messages;
+
+Component ScrollableReciver() {
+
+    class Impl : public ComponentBase {
+        private:
+            float scroll_x = 0.1;
+            float scroll_y = 0.1;
+
+        public:
+            Impl() {
+
+                auto content = Renderer([=] {
+                    Elements history;
+                    for (const auto& msg : received_messages) {
+                        history.push_back(text(msg));
+                    }
+
+                return vbox({std::move(history)});
+            });
+            auto scrollable_content = Renderer(content, [&, content] {
+                return content->Render() | focusPositionRelative(scroll_x, scroll_y) | frame | flex;
+            });
+
+            SliderOption<float> option_x;
+            option_x.value = &scroll_x;
+            option_x.min = 0.f;
+            option_x.max = 1.f;
+            option_x.increment = 0.1f;
+            option_x.direction = Direction::Right;
+            option_x.color_active = Color::Blue;
+            option_x.color_inactive = Color::BlueLight;
+            auto scrollbar_x = Slider(option_x);
+
+            SliderOption<float> option_y;
+            option_y.value = &scroll_y;
+            option_y.min = 0.f;
+            option_y.max = 1.f;
+            option_y.increment = 0.1f;
+            option_y.direction = Direction::Down;
+            option_y.color_active = Color::Yellow;
+            option_y.color_inactive = Color::YellowLight;
+            auto scrollbar_y = Slider(option_y);
+
+            Add(Container::Vertical({
+                    Container::Horizontal({
+                        scrollable_content,
+                        scrollbar_y,}) | flex,
+                    Container::Horizontal({
+                        scrollbar_x,
+                        Renderer([] { return text(L"x"); }),
+                    }),
+                })
+            );
+        }
+    };
+    return Make<Impl>();
 }
 
 // Dropdown with a title
@@ -64,37 +126,77 @@ Component LeftMenu() {
 Component InputWithScrollableHistory() {
 
     static std::string input_text;
-    static std::vector<std::string> transmitted_messages;
-    
-    // The component tree:
-    static auto input_component = Container::Vertical({
-        Input(&input_text, "Type message and press Enter."),
-    });
-    
-    input_component = CatchEvent(input_component, [&](Event event) {
-        if (event == Event::Return && !input_text.empty()) {
-            transmitted_messages.push_back(input_text);
-            input_text.clear();
-            return true;
-        }
-        return false;
-    });
 
-    
-    auto input_renderer = Renderer(input_component, [&] {
-        
-        Elements history;
-        for (const auto& msg : transmitted_messages) {
-            history.push_back(text(msg));
-        }
+    class Impl : public ComponentBase {
+        private:
+            float scroll_x = 0.1;
+            float scroll_y = 0.1;
 
-        return vbox({
-            vbox(std::move(history)) | flex,
-            separator(),
-            hbox(text("Transmit: "), input_component->Render()),}) | border;
-    });
-    
-    return input_renderer;
+        public:
+            Impl() {
+
+                auto content = Renderer([=] {
+                    Elements history;
+                    for (const auto& msg : transmitted_messages) {
+                        history.push_back(text(msg));
+                    }
+
+                return vbox({std::move(history)});
+            });
+
+            auto input_component = Container::Horizontal({
+                Input(&input_text, "Type message and press Enter."),
+            });
+            
+            input_component = CatchEvent(input_component, [&](Event event) {
+                if (event == Event::Return && !input_text.empty()) {
+                    transmitted_messages.push_back(input_text);
+                    input_text.clear();
+                    return true;
+                }
+                return false;
+            });
+
+
+            auto scrollable_content = Renderer(content, [&, content] {
+                return content->Render() | focusPositionRelative(scroll_x, scroll_y) | frame | flex;
+            });
+
+            SliderOption<float> option_x;
+            option_x.value = &scroll_x;
+            option_x.min = 0.f;
+            option_x.max = 1.f;
+            option_x.increment = 0.1f;
+            option_x.direction = Direction::Right;
+            option_x.color_active = Color::Blue;
+            option_x.color_inactive = Color::BlueLight;
+            auto scrollbar_x = Slider(option_x);
+
+            SliderOption<float> option_y;
+            option_y.value = &scroll_y;
+            option_y.min = 0.f;
+            option_y.max = 1.f;
+            option_y.increment = 0.1f;
+            option_y.direction = Direction::Down;
+            option_y.color_active = Color::Yellow;
+            option_y.color_inactive = Color::YellowLight;
+            auto scrollbar_y = Slider(option_y);
+
+            Add(Container::Vertical({
+                    Container::Horizontal({
+                        scrollable_content,
+                        scrollbar_y,}) | flex,
+                    Container::Horizontal({
+                        scrollbar_x,
+                        Renderer([] { return text(L"x"); }),
+                    }),
+                    Renderer([] { return separator(); }),
+                    input_component,
+                })
+            );
+        }
+    };
+    return Make<Impl>();
 }
 
 int main() {
@@ -108,10 +210,11 @@ int main() {
     auto left_menu = LeftMenu();
     // Input menu with scrollable history
     auto input_with_scrollable_history = InputWithScrollableHistory();
+    auto scrollable_receiver = ScrollableReciver();
     
     // Panes
     auto left  = Pane("Config Menu",  left_menu);
-    auto top   = Pane("Receiver",   Renderer([] { return text("Receiver content") | center; }));
+    auto top   = Pane("Receiver",   scrollable_receiver);
     auto bottom= Pane("Transmitter", input_with_scrollable_history);
 
 
