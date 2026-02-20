@@ -2,16 +2,23 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include <vector>
 
 // Threading libraries
 #include <thread>
 #include <atomic>
+#include <queue>
 
 // Linux headers
 #include <fcntl.h> // Contains file controls like O_RDWR
 #include <errno.h> // Error integer and strerror() function
 #include <termios.h> // Contains POSIX terminal control definitions
 #include <unistd.h> // write(), read(), close()
+
+static std::vector<std::string> received_messages;
+static std::vector<std::string> transmitted_messages;
+std::queue<std::string> transmitter_queue;
+
 
 int openSerialPort(const char* port){
     
