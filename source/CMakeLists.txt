@@ -1,12 +1,12 @@
 # UI Library
-add_library(terminal_ui TerminalUI.cpp)
+add_library(custom TerminalUI.cpp SerialPortController.cpp UartSession.cpp)
 
-target_include_directories(terminal_ui
+target_include_directories(custom
     PUBLIC 
         "${PROJECT_SOURCE_DIR}/include"
 )
 
-target_link_libraries(terminal_ui 
+target_link_libraries(custom 
     PUBLIC 
         ftxui::screen  # Or whatever the ftxui target name is in your vendor folder
         ftxui::dom
@@ -20,7 +20,7 @@ add_executable(${CMAKE_PROJECT_NAME} main.cpp)
 # because we marked it as PUBLIC above.
 target_link_libraries(${CMAKE_PROJECT_NAME} 
     PRIVATE 
-        terminal_ui 
+        custom
         vendor
 )
 
