@@ -1,6 +1,9 @@
 #include "SerialPortController.h"
 
-SerialPortController::SerialPortController(const std::string& port_name_, int baudrate_) : port_name(port_name_), baudrate(baudrate_){}
+SerialPortController::SerialPortController(const std::string& port_name_, const std::string& baudrate_) : port_name(port_name_){
+    baudrate = arg2Baud(baudrate_);
+    std::cout << "set baudrate " << baudrate << std::endl;
+}
 
 SerialPortController::~SerialPortController() {
     closeSerialPort();
@@ -15,11 +18,14 @@ void SerialPortController::openSerialPort(){
     } else {
         std::cout << "Opened the port: " << port_name << std::endl;
     }
+
+    configureSerialPort();
+
 }
 
 void SerialPortController::closeSerialPort(){
     close(port);
-
+    std::cout << "Closed serial port\n";
 }
 
 void SerialPortController::configureSerialPort(){
@@ -46,8 +52,9 @@ void SerialPortController::configureSerialPort(){
 
     if (tcsetattr(port, TCSANOW, &tty) != 0){
         std::cerr << "Error writing configureSerialPort: " << strerror(errno) << std::endl;
+    } else {
+        std::cout << "Configurated serial port: " << port << std::endl;
     }
-
 } 
 
 std::string SerialPortController::receiveMessage() {
@@ -58,15 +65,18 @@ std::string SerialPortController::receiveMessage() {
 
     if (n < 0){ 
         std::cerr << "Failed reading from port: " << strerror(errno) << std::endl;
-    } else if (n > 0) {
-        std::cout << "Thread read : " << n << " bytes from port. " << std::endl;
-        std::cout << "Message read: " << std::string(buffer);
+        return "";
+    } 
+    else if (n > 0) {
+        buffer[n] = '\0';   
+        std::cout << "Read " << n << " bytes\n";
+        return std::string(buffer, n);  
     }
 
-    return std::string(buffer);
+    return "";
 }
 
-bool SerialPortController::transmitMessage(int port, const char* buffer, size_t size){
+bool SerialPortController::transmitMessage(const char* buffer, size_t size){
 
     if (write(port, buffer, size) < 0){
         std::cerr << "Failed writing to port: " << strerror(errno) << std::endl;
@@ -76,4 +86,14 @@ bool SerialPortController::transmitMessage(int port, const char* buffer, size_t 
     }
 }
 
+int SerialPortController::arg2Baud(const std::string& arg){
 
+    int baudrate = std::stoi(arg);
+
+    switch(baudrate){
+        case 115200: return B115200;
+        default:
+            std::cerr << "Error setting baudrate: " << baudrate << std::endl;
+            return -1;
+    }
+}
