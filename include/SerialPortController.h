@@ -7,6 +7,7 @@
 #include <termios.h> // Contains POSIX terminal control definitions
 #include <unistd.h> // write(), read(), close()
 
+
 class SerialPortController{
 
     public:
@@ -16,7 +17,8 @@ class SerialPortController{
         std::string receiveMessage();
         bool transmitMessage(const char* buffer, size_t size);
 
-        void openSerialPort();
+        void openSerialPort();            
+        void closeSerialPort();
 
     private:
         std::string port_name;
@@ -24,7 +26,5 @@ class SerialPortController{
         int baudrate;
 
         int arg2Baud(const std::string& arg);
-            
-        void closeSerialPort();
         void configureSerialPort();
 };

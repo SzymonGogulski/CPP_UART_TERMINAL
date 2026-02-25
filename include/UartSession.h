@@ -1,32 +1,44 @@
 #pragma once
 #include "SerialPortController.h"
+#include <condition_variable>
 #include <string>
 #include <thread>
 #include <atomic>
 #include <queue>
 
-
-
 class UartSession {
 
     public:
+
+        UartSession(SerialPortController& s_);
+        ~UartSession();
+        void sendMessage(std::string& message);
+
+        std::vector<std::string> getRxHistory();
+        std::vector<std::string> getTxHistory();
+
+        void startSession();
+        void stopSession();
+        
+    private:
+        std::atomic<bool> running{false};
+
+        void listenerLoop();
+        void writerLoop();
+
         std::vector<std::string> rxHistory;
         std::vector<std::string> txHistory;
-        
-
-
-    private:
-
         std::queue<std::string> txQueue;
+        
+        std::mutex rxMutex;
+        std::mutex txMutex;
+        std::condition_variable queueCV;
+        std::mutex queueMutex;
 
         SerialPortController s;
-        
-        // Listener thread listens to Uart Rx line and writes any read message to rxHistory 
-        std::thread Listener();
 
-        // Writer waits for user to add message to txQueue, when new message arives in queue thread writes it to Uart Tx line. 
-        // If write was successful thread pushes the message to txHistory. 
-        std::thread Writer();
+        std::thread listenerThread;
+        std::thread writerThread;
         
     
     

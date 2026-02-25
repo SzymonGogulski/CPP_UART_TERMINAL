@@ -1,8 +1,10 @@
 #include "TerminalUI.h"
 #include "SerialPortController.h"
+#include "UartSession.h"
 #include <string>
 #include <unistd.h>
 #include <thread>
+
 int main() {
 
     const std::string port = "/dev/ttyACM0";

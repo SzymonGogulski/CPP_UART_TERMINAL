@@ -34,7 +34,7 @@ void SerialPortController::configureSerialPort(){
     if (tcgetattr(port, &tty) != 0) {
         std::cerr << "Error getting port state: " << strerror(errno) << std::endl;
     }
-    
+
     cfsetispeed(&tty, baudrate);
     cfsetospeed(&tty, baudrate);
 
@@ -63,17 +63,15 @@ std::string SerialPortController::receiveMessage() {
 
     int n = read(port, buffer, sizeof(buffer) - 1);
 
-    if (n < 0){ 
-        std::cerr << "Failed reading from port: " << strerror(errno) << std::endl;
+    if (n <= 0){ 
         return "";
     } 
-    else if (n > 0) {
+    else {
         buffer[n] = '\0';   
-        std::cout << "Read " << n << " bytes\n";
         return std::string(buffer, n);  
     }
 
-    return "";
+    return  "";
 }
 
 bool SerialPortController::transmitMessage(const char* buffer, size_t size){
