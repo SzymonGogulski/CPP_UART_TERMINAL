@@ -5,6 +5,7 @@
 #include <thread>
 #include <atomic>
 #include <queue>
+#include <mutex>
 
 class UartSession {
 

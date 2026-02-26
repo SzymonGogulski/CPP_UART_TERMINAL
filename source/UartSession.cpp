@@ -1,6 +1,5 @@
 #include "UartSession.h"
 #include "SerialPortController.h"
-#include <mutex>
 
 UartSession::UartSession(SerialPortController& s_) : s(s_){}
 
@@ -53,6 +52,10 @@ void UartSession::writerLoop(){
         txQueue.pop();
         lock.unlock();
 
+        if (message.empty() || message.back() != '\n') {
+            message += '\n';
+        }
+
         if (s.transmitMessage(message.c_str(), message.size())){
             std::lock_guard<std::mutex> txLock(txMutex);
             txHistory.push_back(message);
@@ -66,12 +69,18 @@ void UartSession::listenerLoop(){
 
     while (running){
         received = s.receiveMessage();
-        
+
         if (!received.empty()){
             std::lock_guard<std::mutex> lock(rxMutex);
             rxHistory.push_back(received);
         }
     } 
+    // int count = 0;
+    // while (running) {
+    //     std::this_thread::sleep_for(std::chrono::seconds(1));
+    //     std::lock_guard<std::mutex> lock(rxMutex);
+    //     rxHistory.push_back("simulated RX message #" + std::to_string(++count));
+    // }
 }
 
 std::vector<std::string> UartSession::getRxHistory(){

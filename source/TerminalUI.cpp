@@ -2,10 +2,13 @@
 
 using namespace ftxui;
 
-TerminalUI::TerminalUI() : screen(ScreenInteractive::Fullscreen()){}
+TerminalUI::TerminalUI(UartSession& session_) : screen(ScreenInteractive::Fullscreen()), session(session_){
+    session.startSession();
+}
 
 TerminalUI::~TerminalUI() {
     screen.Exit();
+    session.stopSession()   ;
 }
 
 void TerminalUI::run(){
@@ -93,6 +96,7 @@ Component TerminalUI::ScrollableSliders(Component content, float& scroll_x, floa
 Component TerminalUI::ScrollableReciver() {
     
     auto content = Renderer([this] {
+    auto received_messages = session.getRxHistory();
         Elements history;
         for (const auto& msg : received_messages) {
             history.push_back(text(msg));
@@ -135,12 +139,17 @@ Component TerminalUI::LeftMenu() {
 Component TerminalUI::InputWithScrollableHistory() {
 
     auto content = Renderer([this] {
-        Elements history;
-        for (const auto& msg : transmitted_messages) {
-            history.push_back(text(msg));
-        }
+    auto tx_messages = session.getTxHistory();
+    auto rx_messages = session.getRxHistory();
+    int rx_count = rx_messages.size();
+    int tx_count = tx_messages.size();
 
-        return vbox({std::move(history)});
+    Elements history;
+    history.push_back(text("TX messages: " + std::to_string(tx_count) + " | RX messages: " + std::to_string(rx_count)));
+    for (const auto& msg : tx_messages) {
+        history.push_back(text(msg));
+    }
+    return vbox({std::move(history)});
     });
 
     auto input_component = Container::Horizontal({
@@ -149,8 +158,8 @@ Component TerminalUI::InputWithScrollableHistory() {
     
     input_component = CatchEvent(input_component, [this](Event event) {
         if (event == Event::Return && !input_text.empty()) {
-            transmitted_messages.push_back(input_text);
-            received_messages.push_back(input_text);
+            
+            session.sendMessage(input_text);
             input_text.clear();
             return true;
         }

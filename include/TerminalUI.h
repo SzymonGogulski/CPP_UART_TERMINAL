@@ -5,17 +5,20 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <string>
 #include <vector>
+#include "UartSession.h"
 
 class TerminalUI{
 
     public:
-        TerminalUI();
+        TerminalUI(UartSession& session_);
         ~TerminalUI();
         void run();
         void renderUI();
 
     private:
         
+        // UartSession
+        UartSession& session;
         // FTXUI base components
         ftxui::Component app;
         ftxui::ScreenInteractive screen;
@@ -32,10 +35,6 @@ class TerminalUI{
         float tx_scroll_y = 0.1f;
         // user input state
         std::string input_text;
-
-        // Messages history
-        std::vector<std::string> received_messages;
-        std::vector<std::string> transmitted_messages;
 
         // Left pane config menus
         std::vector<std::string> entries_buadrate = {"9600", "4800", "19200", "38400", "57600", "115200", "230400", "460800", "921600"};
