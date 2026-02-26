@@ -12,7 +12,7 @@ class UartSession {
 
         UartSession(SerialPortController& s_);
         ~UartSession();
-        void sendMessage(std::string& message);
+        void sendMessage(const std::string& message);
 
         std::vector<std::string> getRxHistory();
         std::vector<std::string> getTxHistory();
@@ -35,7 +35,7 @@ class UartSession {
         std::condition_variable queueCV;
         std::mutex queueMutex;
 
-        SerialPortController s;
+        SerialPortController& s;
 
         std::thread listenerThread;
         std::thread writerThread;
