@@ -6,6 +6,7 @@
 #include <atomic>
 #include <queue>
 #include <mutex>
+#include <functional>
 
 class UartSession {
 
@@ -19,9 +20,13 @@ class UartSession {
         std::vector<std::string> getTxHistory();
 
         void startSession();
+        void setReceiveCallback(std::function<void()> cb);
         void stopSession();
         
     private:
+
+        std::function<void()> onReceive;
+        
         std::atomic<bool> running{false};
 
         void listenerLoop();

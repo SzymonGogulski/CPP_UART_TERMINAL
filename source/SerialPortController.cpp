@@ -46,7 +46,7 @@ void SerialPortController::configureSerialPort(){
     tty.c_lflag = 0;
     tty.c_oflag = 0;
     tty.c_cc[VMIN] = 0;
-    tty.c_cc[VTIME] = 5;
+    tty.c_cc[VTIME] = 1;
     tty.c_iflag &= ~(IXON | IXOFF | IXANY);
     tty.c_cflag |= (CLOCAL | CREAD);
     tty.c_cflag &= ~(PARENB | PARODD);

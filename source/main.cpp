@@ -1,15 +1,20 @@
 #include "TerminalUI.h"
 #include "SerialPortController.h"
 #include "UartSession.h"
-#include <chrono>
 #include <string>
 #include <unistd.h>
-#include <thread>
 
-int main() {
+int main(int argc, char* argv[]) {
 
-    const std::string port = "/dev/ttyACM0";
-    const std::string baudrate = "115200";
+    if (argc == 3){
+        std::cout << "Port: " << argv[1] << " | baudrate: " << argv[2] << std::endl;
+        
+    } else {
+        std::cout << "Not enough arguments. \n";
+        std::abort();
+    }
+    const std::string port = argv[1];
+    const std::string baudrate = argv[2];
 
     SerialPortController s(port, baudrate);
     UartSession session(s);

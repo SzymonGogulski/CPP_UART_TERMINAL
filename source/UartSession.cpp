@@ -14,7 +14,11 @@ void UartSession::startSession(){
     listenerThread = std::thread(&UartSession::listenerLoop, this);
     writerThread = std::thread(&UartSession::writerLoop, this);
 
-} 
+}
+
+void UartSession::setReceiveCallback(std::function<void()> cb) {
+    onReceive = std::move(cb);
+}
 
 void UartSession::stopSession(){
     s.closeSerialPort();
@@ -73,7 +77,9 @@ void UartSession::listenerLoop(){
         if (!received.empty()){
             std::lock_guard<std::mutex> lock(rxMutex);
             rxHistory.push_back(received);
-        }
+            if (onReceive)
+                onReceive();
+            }
     } 
     // int count = 0;
     // while (running) {

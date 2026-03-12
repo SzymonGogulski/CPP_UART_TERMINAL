@@ -3,6 +3,7 @@
 using namespace ftxui;
 
 TerminalUI::TerminalUI(UartSession& session_) : screen(ScreenInteractive::Fullscreen()), session(session_){
+    session.setReceiveCallback([this] {screen.PostEvent(Event::Custom);});
     session.startSession();
 }
 
