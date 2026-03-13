@@ -5,6 +5,8 @@
 A multithreaded UART terminal written in modern C++ with a text-based user interface. 
 
 # YouTube demo
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OZpuCOMibgE/0.jpg)](https://www.youtube.com/watch?v=OZpuCOMibgE)
+
 
 # How to build and run
 
